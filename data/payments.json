@@ -1,0 +1,20 @@
+[
+  {
+    "id": "pay-1",
+    "familyId": "fam-1",
+    "amount": 60,
+    "date": "2026-04-01",
+    "note": "Donazione mensile",
+    "createdAt": "2026-04-26T19:18:58.400Z",
+    "updatedAt": "2026-04-26T19:18:58.400Z"
+  },
+  {
+    "id": "pay-2",
+    "familyId": "fam-2",
+    "amount": 120,
+    "date": "2026-04-05",
+    "note": "Versamento extra",
+    "createdAt": "2026-04-26T19:18:58.404Z",
+    "updatedAt": "2026-04-26T19:18:58.404Z"
+  }
+]

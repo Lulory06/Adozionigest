@@ -1,0 +1,18 @@
+[
+  {
+    "id": "fam-1",
+    "name": "Famiglia Rossi",
+    "country": "Italia",
+    "package": "Base",
+    "createdAt": "2026-04-26T19:18:58.388Z",
+    "updatedAt": "2026-04-26T19:18:58.388Z"
+  },
+  {
+    "id": "fam-2",
+    "name": "Famiglia Silva",
+    "country": "Brasile",
+    "package": "Premium",
+    "createdAt": "2026-04-26T19:18:58.398Z",
+    "updatedAt": "2026-04-26T19:18:58.398Z"
+  }
+]
