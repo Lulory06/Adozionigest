@@ -3,7 +3,7 @@ import { getAllPayments, createPayment, updatePayment, deletePayment, type Payme
 
 export async function GET() {
   try {
-    const payments = getAllPayments();
+    const payments = await getAllPayments();
     return NextResponse.json(payments);
   } catch (error) {
     return NextResponse.json({ error: 'Errore nel recupero dei pagamenti' }, { status: 500 });
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       note: note || null,
     };
 
-    createPayment(payment);
+    await createPayment(payment);
     return NextResponse.json(payment, { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: 'Errore nella creazione del pagamento' }, { status: 500 });
@@ -51,7 +51,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Importo deve essere un numero positivo' }, { status: 400 });
     }
 
-    updatePayment(id, {
+    await updatePayment(id, {
       familyId,
       amount: Number(amount),
       date,
@@ -72,7 +72,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'ID è obbligatorio' }, { status: 400 });
     }
 
-    deletePayment(id);
+    await deletePayment(id);
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: 'Errore nell\'eliminazione del pagamento' }, { status: 500 });

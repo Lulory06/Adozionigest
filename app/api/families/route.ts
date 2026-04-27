@@ -3,7 +3,7 @@ import { getAllFamilies, createFamily, updateFamily, deleteFamily, type Family }
 
 export async function GET() {
   try {
-    const families = getAllFamilies();
+    const families = await getAllFamilies();
     return NextResponse.json(families);
   } catch (error) {
     return NextResponse.json({ error: 'Errore nel recupero delle famiglie' }, { status: 500 });
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
       package: packageType,
     };
 
-    createFamily(family);
+    await createFamily(family);
     return NextResponse.json(family, { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: 'Errore nella creazione della famiglia' }, { status: 500 });
@@ -42,7 +42,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'ID, nome, paese e pacchetto sono obbligatori' }, { status: 400 });
     }
 
-    updateFamily(id, { name, country, package: packageType });
+    await updateFamily(id, { name, country, package: packageType });
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: 'Errore nell\'aggiornamento della famiglia' }, { status: 500 });
@@ -58,7 +58,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'ID è obbligatorio' }, { status: 400 });
     }
 
-    deleteFamily(id);
+    await deleteFamily(id);
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: 'Errore nell\'eliminazione della famiglia' }, { status: 500 });
