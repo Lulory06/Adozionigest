@@ -11,11 +11,18 @@ datasource db {
 }
 
 model Family {
-  id       String @id @default(cuid())
-  name     String
-  country  String
-  package  String
-  payments Payment[]
+  id        String   @id @default(cuid())
+  type      String   @default("famiglia") // "persona" | "famiglia"
+  name      String
+  surname   String   @default("")
+  address   String   @default("")
+  city      String   @default("")
+  cap       String   @default("")
+  province  String   @default("")
+  region    String   @default("")
+  country   String
+  package   String   @default("Classe") // "Classe" | "bambino singolo"
+  payments  Payment[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

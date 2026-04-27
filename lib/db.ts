@@ -4,7 +4,14 @@ const prisma = new PrismaClient();
 
 export type Family = {
   id: string;
+  type: string;
   name: string;
+  surname: string;
+  address: string;
+  city: string;
+  cap: string;
+  province: string;
+  region: string;
   country: string;
   package: string;
   createdAt: Date;

@@ -13,7 +13,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, name, country, package: packageType } = body;
+    const { id, type, name, surname, address, cap, city, province, region, country, package: packageType } = body;
 
     if (!name || !country || !packageType) {
       return NextResponse.json({ error: 'Nome, paese e pacchetto sono obbligatori' }, { status: 400 });
@@ -21,7 +21,14 @@ export async function POST(request: NextRequest) {
 
     const family: Omit<Family, 'createdAt' | 'updatedAt'> = {
       id: id || `fam-${Date.now()}`,
+      type: type || 'famiglia',
       name,
+      surname: surname || '',
+      address: address || '',
+      cap: cap || '',
+      city: city || '',
+      province: province || '',
+      region: region || '',
       country,
       package: packageType,
     };
@@ -29,23 +36,23 @@ export async function POST(request: NextRequest) {
     await createFamily(family);
     return NextResponse.json(family, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Errore nella creazione della famiglia' }, { status: 500 });
+    return NextResponse.json({ error: 'Errore nella creazione' }, { status: 500 });
   }
 }
 
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, name, country, package: packageType } = body;
+    const { id, type, name, surname, address, cap, city, province, region, country, package: packageType } = body;
 
     if (!id || !name || !country || !packageType) {
       return NextResponse.json({ error: 'ID, nome, paese e pacchetto sono obbligatori' }, { status: 400 });
     }
 
-    await updateFamily(id, { name, country, package: packageType });
+    await updateFamily(id, { type, name, surname, address, cap, city, province, region, country, package: packageType });
     return NextResponse.json({ success: true });
   } catch (error) {
-    return NextResponse.json({ error: 'Errore nell\'aggiornamento della famiglia' }, { status: 500 });
+    return NextResponse.json({ error: 'Errore nell\'aggiornamento' }, { status: 500 });
   }
 }
 

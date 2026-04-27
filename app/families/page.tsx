@@ -1,10 +1,17 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 
 type Family = {
   id: string;
+  type: string;
   name: string;
+  surname: string;
+  address: string;
+  city: string;
+  cap: string;
+  province: string;
+  region: string;
   country: string;
   package: string;
   createdAt: string;
@@ -23,10 +30,18 @@ type Payment = {
 
 export default function FamiliesPage() {
   const [families, setFamilies] = useState<Family[]>([]);
-  const [payments, setPayments] = useState<Payment[]>([]);
+  const [payments, setPayments] = useState<Payment[]>([]);  
+  // Form fields
+  const [familyType, setFamilyType] = useState<'persona' | 'famiglia'>('famiglia');
   const [familyName, setFamilyName] = useState('');
+  const [familySurname, setFamilySurname] = useState('');
+  const [familyAddress, setFamilyAddress] = useState('');
+  const [familyCap, setFamilyCap] = useState('');
+  const [familyCity, setFamilyCity] = useState('');
+  const [familyProvince, setFamilyProvince] = useState('');
+  const [familyRegion, setFamilyRegion] = useState('');
   const [familyCountry, setFamilyCountry] = useState('Italia');
-  const [familyPackage, setFamilyPackage] = useState('Base');
+  const [familyPackage, setFamilyPackage] = useState('Classe');  
   const [editFamilyId, setEditFamilyId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -60,8 +75,31 @@ export default function FamiliesPage() {
 
     const method = editFamilyId ? 'PUT' : 'POST';
     const body = editFamilyId
-      ? { id: editFamilyId, name: familyName.trim(), country: familyCountry, package: familyPackage }
-      : { name: familyName.trim(), country: familyCountry, package: familyPackage };
+      ? { 
+          id: editFamilyId, 
+          type: familyType,
+          name: familyName.trim(), 
+          surname: familySurname.trim(),
+          address: familyAddress.trim(),
+          cap: familyCap.trim(),
+          city: familyCity.trim(),
+          province: familyProvince.trim(),
+          region: familyRegion.trim(),
+          country: familyCountry, 
+          package: familyPackage 
+        }
+      : { 
+          type: familyType,
+          name: familyName.trim(), 
+          surname: familySurname.trim(),
+          address: familyAddress.trim(),
+          cap: familyCap.trim(),
+          city: familyCity.trim(),
+          province: familyProvince.trim(),
+          region: familyRegion.trim(),
+          country: familyCountry, 
+          package: familyPackage 
+        };
 
     try {
       const response = await fetch('/api/families', {
@@ -72,10 +110,7 @@ export default function FamiliesPage() {
 
       if (response.ok) {
         await loadData();
-        setFamilyName('');
-        setFamilyCountry('Italia');
-        setFamilyPackage('Base');
-        setEditFamilyId(null);
+        resetForm();
       } else {
         const error = await response.json();
         alert(error.error || 'Errore nell\'operazione');
@@ -88,16 +123,34 @@ export default function FamiliesPage() {
 
   function startEditFamily(family: Family) {
     setEditFamilyId(family.id);
+    setFamilyType(family.type as 'persona' | 'famiglia');
     setFamilyName(family.name);
+    setFamilySurname(family.surname || '');
+    setFamilyAddress(family.address || '');
+    setFamilyCap(family.cap || '');
+    setFamilyCity(family.city || '');
+    setFamilyProvince(family.province || '');
+    setFamilyRegion(family.region || '');
     setFamilyCountry(family.country);
     setFamilyPackage(family.package);
   }
 
-  function cancelEditFamily() {
-    setEditFamilyId(null);
+  function resetForm() {
+    setFamilyType('famiglia');
     setFamilyName('');
+    setFamilySurname('');
+    setFamilyAddress('');
+    setFamilyCap('');
+    setFamilyCity('');
+    setFamilyProvince('');
+    setFamilyRegion('');
     setFamilyCountry('Italia');
-    setFamilyPackage('Base');
+    setFamilyPackage('Classe');
+    setEditFamilyId(null);
+  }
+
+  function cancelEditFamily() {
+    resetForm();
   }
 
   async function deleteFamily(id: string) {
@@ -142,42 +195,114 @@ export default function FamiliesPage() {
   return (
     <main className="main">
       <section className="header">
-        <h1>Gestione Famiglie</h1>
+        <h1>Gestione Adozioni</h1>
         <p>Aggiungi, modifica o elimina le famiglie adottate.</p>
       </section>
 
       <section className="panel">
-        <h2>{editFamilyId ? 'Modifica famiglia' : 'Nuova famiglia'}</h2>
+        <h2>{editFamilyId ? 'Modifica' : 'Nuova'} adozione</h2>
         <form onSubmit={addFamily} className="formGroup">
+          {/* Tipo: Persona o Famiglia */}
           <label>
-            Nome famiglia
+            Tipo
+            <select value={familyType} onChange={(e) => setFamilyType(e.target.value as 'persona' | 'famiglia')}>
+              <option value="famiglia">Famiglia</option>
+              <option value="persona">Persona singola</option>
+            </select>
+          </label>
+
+          {/* Nome e Cognome */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <label>
+              {familyType === 'famiglia' ? 'Nome famiglia' : 'Nome'}
+              <input
+                value={familyName}
+                onChange={(event) => setFamilyName(event.target.value)}
+                placeholder={familyType === 'famiglia' ? 'Es. Famiglia Bianchi' : 'Es. Mario'}
+                required
+              />
+            </label>
+            <label>
+              Cognome
+              <input
+                value={familySurname}
+                onChange={(event) => setFamilySurname(event.target.value)}
+                placeholder="Es. Rossi"
+              />
+            </label>
+          </div>
+
+          {/* Indirizzo */}
+          <label>
+            Indirizzo di abitazione
             <input
-              value={familyName}
-              onChange={(event) => setFamilyName(event.target.value)}
-              placeholder="Es. Famiglia Bianchi"
-              required
+              value={familyAddress}
+              onChange={(event) => setFamilyAddress(event.target.value)}
+              placeholder="Es. Via Roma 123"
             />
           </label>
-          <label>
-            Paese
-            <input
-              value={familyCountry}
-              onChange={(event) => setFamilyCountry(event.target.value)}
-              placeholder="Es. Italia"
-              required
-            />
-          </label>
+
+          {/* CAP, Città, Provincia */}
+          <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr 100px', gap: 12 }}>
+            <label>
+              CAP
+              <input
+                value={familyCap}
+                onChange={(event) => setFamilyCap(event.target.value)}
+                placeholder="00100"
+              />
+            </label>
+            <label>
+              Città
+              <input
+                value={familyCity}
+                onChange={(event) => setFamilyCity(event.target.value)}
+                placeholder="Es. Roma"
+              />
+            </label>
+            <label>
+              Provincia
+              <input
+                value={familyProvince}
+                onChange={(event) => setFamilyProvince(event.target.value)}
+                placeholder="Es. RM"
+              />
+            </label>
+          </div>
+
+          {/* Regione e Stato */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <label>
+              Regione
+              <input
+                value={familyRegion}
+                onChange={(event) => setFamilyRegion(event.target.value)}
+                placeholder="Es. Lazio"
+              />
+            </label>
+            <label>
+              Stato
+              <input
+                value={familyCountry}
+                onChange={(event) => setFamilyCountry(event.target.value)}
+                placeholder="Es. Italia"
+                required
+              />
+            </label>
+          </div>
+
+          {/* Pacchetto adozione */}
           <label>
             Pacchetto di adozione
             <select value={familyPackage} onChange={(event) => setFamilyPackage(event.target.value)}>
-              <option>Base</option>
-              <option>Standard</option>
-              <option>Premium</option>
+              <option value="Classe">Classe</option>
+              <option value="bambino singolo">bambino singolo</option>
             </select>
           </label>
+
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
             <button type="submit">
-              {editFamilyId ? 'Salva modifiche' : 'Aggiungi famiglia'}
+              {editFamilyId ? 'Salva modifiche' : 'Aggiungi'}
             </button>
             {editFamilyId ? (
               <button type="button" className="secondary" onClick={cancelEditFamily}>
@@ -189,21 +314,29 @@ export default function FamiliesPage() {
       </section>
 
       <section className="panel" style={{ marginTop: 24 }}>
-        <h2>Elenco famiglie ({families.length})</h2>
+        <h2>Elenco adozioni ({families.length})</h2>
         <table>
           <thead>
             <tr>
-              <th>Famiglia</th>
-              <th>Paese</th>
+              <th>Tipo</th>
+              <th>Nome</th>
+              <th>Cognome</th>
+              <th>Indirizzo</th>
+              <th>Città</th>
+              <th>Stato</th>
               <th>Pacchetto</th>
-              <th>Totale versato</th>
+              <th>Totale</th>
               <th>Azioni</th>
             </tr>
           </thead>
           <tbody>
             {familiesWithTotals.map(({ family, total }) => (
               <tr key={family.id}>
+                <td>{family.type === 'famiglia' ? 'Famiglia' : 'Persona'}</td>
                 <td>{family.name}</td>
+                <td>{family.surname || '-'}</td>
+                <td>{family.address || '-'}</td>
+                <td>{family.city || '-'}</td>
                 <td>{family.country}</td>
                 <td>{family.package}</td>
                 <td>€ {total.toFixed(2)}</td>
