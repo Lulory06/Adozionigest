@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllPayments, createPayment, updatePayment, deletePayment, type Payment } from '../../../lib/db';
+import { payment } from '../../../lib/db';
 
 export async function GET() {
   try {
-    const payments = await getAllPayments();
+    const payments = await payment.getAll();
     return NextResponse.json(payments);
   } catch (error) {
     return NextResponse.json({ error: 'Errore nel recupero dei pagamenti' }, { status: 500 });
@@ -13,53 +13,80 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, familyId, amount, date, note } = body;
+    const {
+      familyId,
+      adoptionId,
+      fundId,
+      amount,
+      date,
+      competenceYear,
+      description,
+      issueReceipt,
+    } = body;
 
     if (!familyId || !amount || !date) {
       return NextResponse.json({ error: 'Famiglia, importo e data sono obbligatori' }, { status: 400 });
     }
 
-    if (isNaN(Number(amount)) || Number(amount) <= 0) {
-      return NextResponse.json({ error: 'Importo deve essere un numero positivo' }, { status: 400 });
+    const year = competenceYear || new Date(date).getFullYear();
+    let receiptNumber = null;
+    let receiptIssued = false;
+
+    // Genera numero ricevuta se richiesto
+    if (issueReceipt) {
+      receiptNumber = await payment.getNextReceiptNumber(year);
+      receiptIssued = true;
     }
 
-    const payment: Omit<Payment, 'createdAt' | 'updatedAt'> = {
-      id: id || `pay-${Date.now()}`,
+    const newPayment = await payment.create({
       familyId,
-      amount: Number(amount),
-      date,
-      note: note || null,
-    };
+      adoptionId: adoptionId || null,
+      fundId: fundId || null,
+      amount: parseFloat(amount),
+      date: new Date(date),
+      competenceYear: year,
+      description: description || null,
+      receiptNumber,
+      receiptIssued,
+    });
 
-    await createPayment(payment);
-    return NextResponse.json(payment, { status: 201 });
+    return NextResponse.json(newPayment, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Errore nella creazione del pagamento' }, { status: 500 });
+    return NextResponse.json({ error: 'Errore nella creazione' }, { status: 500 });
   }
 }
 
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, familyId, amount, date, note } = body;
-
-    if (!id || !familyId || !amount || !date) {
-      return NextResponse.json({ error: 'ID, famiglia, importo e data sono obbligatori' }, { status: 400 });
-    }
-
-    if (isNaN(Number(amount)) || Number(amount) <= 0) {
-      return NextResponse.json({ error: 'Importo deve essere un numero positivo' }, { status: 400 });
-    }
-
-    await updatePayment(id, {
+    const {
+      id,
       familyId,
-      amount: Number(amount),
+      adoptionId,
+      fundId,
+      amount,
       date,
-      note: note || null,
+      competenceYear,
+      description,
+    } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: 'ID è obbligatorio' }, { status: 400 });
+    }
+
+    const updated = await payment.update(id, {
+      familyId,
+      adoptionId: adoptionId || null,
+      fundId: fundId || null,
+      amount: parseFloat(amount),
+      date: new Date(date),
+      competenceYear: competenceYear || new Date(date).getFullYear(),
+      description: description || null,
     });
-    return NextResponse.json({ success: true });
+
+    return NextResponse.json(updated);
   } catch (error) {
-    return NextResponse.json({ error: 'Errore nell\'aggiornamento del pagamento' }, { status: 500 });
+    return NextResponse.json({ error: 'Errore nell\'aggiornamento' }, { status: 500 });
   }
 }
 
@@ -72,9 +99,9 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'ID è obbligatorio' }, { status: 400 });
     }
 
-    await deletePayment(id);
+    await payment.delete(id);
     return NextResponse.json({ success: true });
   } catch (error) {
-    return NextResponse.json({ error: 'Errore nell\'eliminazione del pagamento' }, { status: 500 });
+    return NextResponse.json({ error: 'Errore nell\'eliminazione' }, { status: 500 });
   }
 }

@@ -1,39 +1,96 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String?
+  email     String   @unique
+  password  String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Family {
-  id        String   @id @default(cuid())
-  type      String   @default("famiglia") // "persona" | "famiglia"
-  name      String
-  surname   String   @default("")
-  address   String   @default("")
-  city      String   @default("")
-  cap       String   @default("")
-  province  String   @default("")
-  region    String   @default("")
-  country   String
-  package   String   @default("Classe") // "Classe" | "bambino singolo"
+  id         String    @id @default(cuid())
+  type       String    @default("famiglia")
+  name       String
+  surname    String    @default("")
+  address    String    @default("")
+  city       String    @default("")
+  cap        String    @default("")
+  province   String    @default("")
+  region     String    @default("")
+  country    String
+  package    String    @default("Classe")
+  status     String    @default("active")
+  postalName String?
+  notes      String?
+  payments   Payment[]
+  adoptions  Adoption[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model Adopted {
+  id          String     @id @default(cuid())
+  name        String
+  birthDate   DateTime?
+  gender      String?
+  motherName  String?
+  fatherName  String?
+  schoolGrade String?
+  notes       String?
+  adoptions   Adoption[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Adoption {
+  id        String    @id @default(cuid())
+  familyId  String
+  adoptedId String
+  startDate DateTime
+  endDate   DateTime?
+  isActive  Boolean   @default(true)
+  family    Family    @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  adopted   Adopted   @relation(fields: [adoptedId], references: [id], onDelete: Cascade)
   payments  Payment[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([adoptedId, isActive])
+}
+
+model Fund {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  payments    Payment[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Payment {
-  id        String @id @default(cuid())
-  familyId  String
-  family    Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
-  amount    Float
-  date      String
-  note      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String    @id @default(cuid())
+  familyId       String
+  adoptionId     String?
+  fundId         String?
+  amount         Float
+  date           DateTime
+  competenceYear Int
+  description    String?
+  receiptNumber  String?
+  receiptIssued  Boolean   @default(false)
+  family         Family    @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  adoption       Adoption? @relation(fields: [adoptionId], references: [id])
+  fund           Fund?     @relation(fields: [fundId], references: [id])
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }

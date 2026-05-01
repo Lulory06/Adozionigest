@@ -7,6 +7,7 @@ type Family = {
   name: string;
   country: string;
   package: string;
+  status?: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -16,14 +17,25 @@ type Payment = {
   familyId: string;
   amount: number;
   date: string;
+  competenceYear: number;
   note: string | null;
   createdAt: string;
   updatedAt: string;
 };
 
+type Statistics = {
+  totalFamilies: number;
+  activeFamilies: number;
+  totalAdopted: number;
+  activeAdoptions: number;
+  totalPayments: number;
+  paymentsThisYear: number;
+};
+
 export default function Home() {
   const [families, setFamilies] = useState<Family[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
+  const [stats, setStats] = useState<Statistics | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -42,6 +54,23 @@ export default function Home() {
         const paymentsData = await paymentsRes.json();
         setFamilies(familiesData);
         setPayments(paymentsData);
+
+        // Calcola statistiche
+        const currentYear = new Date().getFullYear();
+        const activeFamilies = familiesData.filter((f: Family) => f.status !== 'archived').length;
+        const paymentsThisYear = paymentsData
+          .filter((p: Payment) => p.competenceYear === currentYear)
+          .reduce((sum: number, p: Payment) => sum + p.amount, 0);
+        const totalPayments = paymentsData.reduce((sum: number, p: Payment) => sum + p.amount, 0);
+
+        setStats({
+          totalFamilies: familiesData.length,
+          activeFamilies,
+          totalAdopted: 0, // Da implementare con API dedicata
+          activeAdoptions: 0, // Da implementare con API dedicata
+          totalPayments,
+          paymentsThisYear,
+        });
       }
     } catch (error) {
       console.error('Errore nel caricamento dei dati:', error);
@@ -49,15 +78,6 @@ export default function Home() {
       setLoading(false);
     }
   }
-
-  const familiesWithTotals = useMemo(() => {
-    return families.map((family) => {
-      const total = payments
-        .filter((payment) => payment.familyId === family.id)
-        .reduce((sum, payment) => sum + payment.amount, 0);
-      return { family, total };
-    });
-  }, [families, payments]);
 
   const totalAmount = useMemo(
     () => payments.reduce((sum, payment) => sum + payment.amount, 0),
@@ -84,25 +104,25 @@ export default function Home() {
     <main className="main">
       <section className="header">
         <h1>Dashboard Adozioni a distanza</h1>
-        <p>Riassunto generale delle famiglie e dei pagamenti.</p>
+        <p>Riassunto generale delle famiglie, adottati, adozioni e versamenti.</p>
       </section>
 
       <section className="summary">
         <div className="summary-card">
           <h3>Famiglie registrate</h3>
-          <p>{families.length}</p>
+          <p>{stats?.totalFamilies || families.length}</p>
+        </div>
+        <div className="summary-card">
+          <h3>Famiglie attive</h3>
+          <p>{stats?.activeFamilies || families.filter(f => f.status !== 'archived').length}</p>
         </div>
         <div className="summary-card">
           <h3>Versamenti totali</h3>
           <p>€ {totalAmount.toFixed(2)}</p>
         </div>
         <div className="summary-card">
-          <h3>Versamenti questo mese</h3>
-          <p>{payments.filter(p => p.date.startsWith(new Date().toISOString().slice(0, 7))).length}</p>
-        </div>
-        <div className="summary-card">
-          <h3>Ultimo versamento</h3>
-          <p>{payments.length > 0 ? payments[payments.length - 1].date : 'Nessuno'}</p>
+          <h3>Versamenti anno corrente</h3>
+          <p>€ {(stats?.paymentsThisYear || 0).toFixed(2)}</p>
         </div>
       </section>
 
@@ -117,15 +137,23 @@ export default function Home() {
               </tr>
             </thead>
             <tbody>
-              {familiesWithTotals
-                .sort((a, b) => b.total - a.total)
-                .slice(0, 5)
-                .map(({ family, total }) => (
-                  <tr key={family.id}>
-                    <td>{family.name}</td>
-                    <td>€ {total.toFixed(2)}</td>
-                  </tr>
-                ))}
+              {(() => {
+                const familiesWithTotals = families.map((family) => {
+                  const total = payments
+                    .filter((payment) => payment.familyId === family.id)
+                    .reduce((sum, payment) => sum + payment.amount, 0);
+                  return { family, total };
+                });
+                return familiesWithTotals
+                  .sort((a, b) => b.total - a.total)
+                  .slice(0, 5)
+                  .map(({ family, total }) => (
+                    <tr key={family.id}>
+                      <td>{family.name}</td>
+                      <td>€ {total.toFixed(2)}</td>
+                    </tr>
+                  ));
+              })()}
             </tbody>
           </table>
         </section>
@@ -145,7 +173,7 @@ export default function Home() {
                 const family = families.find((item) => item.id === payment.familyId);
                 return (
                   <tr key={payment.id}>
-                    <td>{payment.date}</td>
+                    <td>{new Date(payment.date).toLocaleDateString('it-IT')}</td>
                     <td>{family?.name ?? 'Famiglia non trovata'}</td>
                     <td>€ {payment.amount.toFixed(2)}</td>
                   </tr>
@@ -162,11 +190,20 @@ export default function Home() {
           <a href="/families" style={{ textDecoration: 'none' }}>
             <button>Gestisci Famiglie</button>
           </a>
+          <a href="/adopted" style={{ textDecoration: 'none' }}>
+            <button>Gestisci Adottati</button>
+          </a>
+          <a href="/adoptions" style={{ textDecoration: 'none' }}>
+            <button>Gestisci Adozioni</button>
+          </a>
           <a href="/payments" style={{ textDecoration: 'none' }}>
             <button>Gestisci Pagamenti</button>
           </a>
+          <a href="/funds" style={{ textDecoration: 'none' }}>
+            <button>Gestisci Fondi</button>
+          </a>
           <a href="/reports" style={{ textDecoration: 'none' }}>
-            <button>Estrazioni Pagamenti</button>
+            <button>Estrazioni e Report</button>
           </a>
         </div>
       </section>
