@@ -20,8 +20,10 @@
     "incremental": true,
     "types": [
       "node"
-    ],
-    "plugins": [
+    ],    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    },    "plugins": [
       {
         "name": "next"
       }

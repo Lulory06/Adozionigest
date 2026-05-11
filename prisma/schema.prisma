@@ -13,6 +13,7 @@ model User {
   email     String   @unique
   password  String
   role      String   @default("admin")
+  transactions Transaction[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -34,6 +35,7 @@ model Family {
   notes      String?
   payments   Payment[]
   adoptions  Adoption[]
+  transactions Transaction[]
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 }
@@ -93,4 +95,48 @@ model Payment {
   fund           Fund?     @relation(fields: [fundId], references: [id])
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+}
+
+// ==================== ACCOUNTING MODULE ====================
+
+model IncomeCategory {
+  id          String       @id @default(cuid())
+  name        String       @unique
+  description String?
+  isActive    Boolean      @default(true)
+  transactions Transaction[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model ExpenseCategory {
+  id          String       @id @default(cuid())
+  name        String       @unique
+  description String?
+  isActive    Boolean      @default(true)
+  transactions Transaction[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Transaction {
+  id                String          @id @default(cuid())
+  type              String
+  amount            Float
+  date              DateTime
+  registrationDate DateTime        @default(now())
+  description       String
+  incomeCategoryId  String?
+  incomeCategory    IncomeCategory? @relation(fields: [incomeCategoryId], references: [id])
+  expenseCategoryId String?
+  expenseCategory   ExpenseCategory? @relation(fields: [expenseCategoryId], references: [id])
+  familyId          String?
+  family            Family?         @relation(fields: [familyId], references: [id])
+  paymentMethod     String?
+  documentNumber    String?
+  notes             String?
+  userId            String?
+  user              User?           @relation(fields: [userId], references: [id])
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
 }

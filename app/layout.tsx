@@ -34,6 +34,7 @@ export default function RootLayout({
             <a href="/payments" style={{ color: 'white', textDecoration: 'none', padding: '8px 12px', borderRadius: 4, background: 'transparent', transition: 'background 0.2s' }}>Pagamenti</a>
             <a href="/funds" style={{ color: 'white', textDecoration: 'none', padding: '8px 12px', borderRadius: 4, background: 'transparent', transition: 'background 0.2s' }}>Fondi</a>
             <a href="/reports" style={{ color: 'white', textDecoration: 'none', padding: '8px 12px', borderRadius: 4, background: 'transparent', transition: 'background 0.2s' }}>Report</a>
+            <a href="/accounting" style={{ color: 'white', textDecoration: 'none', padding: '8px 12px', borderRadius: 4, background: 'transparent', transition: 'background 0.2s' }}>Contabilità</a>
           </div>
         </nav>
         {children}
