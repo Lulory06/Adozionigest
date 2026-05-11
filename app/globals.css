@@ -158,3 +158,69 @@ tbody tr:hover {
 nav a:hover {
   background: rgba(255, 255, 255, 0.1) !important;
 }
+
+nav .navLinks {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+nav .navItem {
+  position: relative;
+}
+
+nav .navItem summary {
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background 0.2s;
+  color: white;
+  cursor: pointer;
+}
+
+nav .navItem summary::-webkit-details-marker {
+  display: none;
+}
+
+nav .navItem summary:focus,
+nav .navItem summary:hover,
+nav .navItem[open] summary {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+nav .navDropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background-color: #2d3748;
+  min-width: 220px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+  border-radius: 8px;
+  z-index: 10;
+  overflow: hidden;
+}
+
+nav .navItem[open] > .navDropdown {
+  display: block;
+}
+
+nav .navDropdown a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 12px 16px;
+  border-bottom: 1px solid #4a5568;
+  transition: background 0.2s;
+}
+
+nav .navDropdown a:last-child {
+  border-bottom: none;
+}
+
+nav .navDropdown a:hover {
+  background: rgba(255, 255, 255, 0.08);
+}

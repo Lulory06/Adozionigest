@@ -26,17 +26,42 @@ export default function RootLayout({
           gap: '8px',
         }}>
           <h1 style={{ margin: 0, fontSize: '1.25rem' }}>Adozioni a Distanza</h1>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <a href="/" style={{ color: 'white', textDecoration: 'none', padding: '8px 12px', borderRadius: 4, background: 'transparent', transition: 'background 0.2s' }}>Dashboard</a>
-            <a href="/families" style={{ color: 'white', textDecoration: 'none', padding: '8px 12px', borderRadius: 4, background: 'transparent', transition: 'background 0.2s' }}>Famiglie</a>
-            <a href="/adopted" style={{ color: 'white', textDecoration: 'none', padding: '8px 12px', borderRadius: 4, background: 'transparent', transition: 'background 0.2s' }}>Adottati</a>
-            <a href="/adoptions" style={{ color: 'white', textDecoration: 'none', padding: '8px 12px', borderRadius: 4, background: 'transparent', transition: 'background 0.2s' }}>Adozioni</a>
-            <a href="/payments" style={{ color: 'white', textDecoration: 'none', padding: '8px 12px', borderRadius: 4, background: 'transparent', transition: 'background 0.2s' }}>Pagamenti</a>
-            <a href="/funds" style={{ color: 'white', textDecoration: 'none', padding: '8px 12px', borderRadius: 4, background: 'transparent', transition: 'background 0.2s' }}>Fondi</a>
-            <a href="/reports" style={{ color: 'white', textDecoration: 'none', padding: '8px 12px', borderRadius: 4, background: 'transparent', transition: 'background 0.2s' }}>Report</a>
-            <a href="/accounting" style={{ color: 'white', textDecoration: 'none', padding: '8px 12px', borderRadius: 4, background: 'transparent', transition: 'background 0.2s' }}>Contabilità</a>
+          <div className="navLinks">
+            <details className="navItem">
+              <summary className="navLabel">Anagrafiche</summary>
+              <div className="navDropdown">
+                <a href="/families">Famiglie</a>
+                <a href="/adopted">Adottati</a>
+                <a href="/family-adoptions">Associazioni Famiglie-Adottati</a>
+                <a href="/funds">Fondi</a>
+              </div>
+            </details>
+
+            <details className="navItem">
+              <summary className="navLabel">Adozioni</summary>
+              <div className="navDropdown">
+                <a href="/adoptions-dashboard">Dashboard Adozioni</a>
+                <a href="/adoptions">Gestione Adozioni</a>
+              </div>
+            </details>
+
+            <details className="navItem">
+              <summary className="navLabel">Contabilità</summary>
+              <div className="navDropdown">
+                <a href="/accounting">Dashboard Contabilità</a>
+                <a href="/payments">Pagamenti</a>
+              </div>
+            </details>
+
+            <details className="navItem">
+              <summary className="navLabel">Report</summary>
+              <div className="navDropdown">
+                <a href="/reports">Report Adozioni e Contabilità</a>
+              </div>
+            </details>
           </div>
         </nav>
+
         {children}
       </body>
     </html>

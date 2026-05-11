@@ -97,7 +97,14 @@ model Payment {
   updatedAt      DateTime  @updatedAt
 }
 
-// ==================== ACCOUNTING MODULE ====================
+model PaymentType {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  description String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
 
 model IncomeCategory {
   id          String       @id @default(cuid())

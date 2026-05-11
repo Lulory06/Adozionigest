@@ -411,6 +411,23 @@ export async function getAccountingOverview(period: string = 'mese') {
   };
 }
 
+// ==================== PAYMENT TYPES ====================
+export const paymentType = {
+  getAll: () => prisma.paymentType.findMany({
+    where: { isActive: true },
+    orderBy: { name: 'asc' }
+  }),
+  getAllIncludingInactive: () => prisma.paymentType.findMany({
+    orderBy: { name: 'asc' }
+  }),
+  getById: (id: string) => prisma.paymentType.findUnique({ where: { id } }),
+  create: (data: { name: string; description?: string; isActive?: boolean }) =>
+    prisma.paymentType.create({ data }),
+  update: (id: string, data: { name?: string; description?: string; isActive?: boolean }) =>
+    prisma.paymentType.update({ where: { id }, data }),
+  delete: (id: string) => prisma.paymentType.delete({ where: { id } }),
+};
+
 // Close connection on exit
 process.on('beforeExit', async () => {
   await prisma.$disconnect();
