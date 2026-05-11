@@ -1,13 +1,19 @@
-'use client';
-
 import Link from 'next/link';
 import { ReactNode } from 'react';
+import { getServerSession } from 'next-auth';
+import { redirect } from 'next/navigation';
+import { authOptions } from '../../lib/auth';
 
 interface AccountingLayoutProps {
   children: ReactNode;
 }
 
-export default function AccountingLayout({ children }: AccountingLayoutProps) {
+export default async function AccountingLayout({ children }: AccountingLayoutProps) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    redirect('/login');
+  }
+
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
